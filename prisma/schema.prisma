@@ -1,0 +1,278 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum LessonCategory {
+  daily_conversation
+  business_english
+  news_discussion
+  review
+}
+
+enum CefrLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum ReviewItemType {
+  grammar
+  vocabulary
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  firebaseUid        String   @unique
+  email              String   @unique
+  displayName        String?
+  currentCefrEstimate CefrLevel?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  learningHistory    LearningHistory[]
+  speakingFeedback   SpeakingFeedback[]
+  writingFeedback    WritingFeedback[]
+  reviewSchedules    ReviewSchedule[]
+  favoriteVocabulary FavoriteVocabulary[]
+  favoriteGrammar    FavoriteGrammar[]
+  favoriteExpression FavoriteExpression[]
+  createdVocabulary  Vocabulary[]         @relation("VocabularyCreatedBy")
+  createdExpressions Expression[]         @relation("ExpressionCreatedBy")
+  createdGrammar     Grammar[]            @relation("GrammarCreatedBy")
+}
+
+// A generated 15-minute lesson unit (see docs/ai-prompt-design.md for the
+// generation prompt that produces this shape). Sub-sections that are only
+// ever read/written as a whole (comprehension questions, speaking/writing
+// tasks) are stored as JSON rather than normalized tables. Key expressions
+// are normalized into Expression (like Vocabulary/Grammar) since they need
+// a stable id for per-user favoriting.
+model Lesson {
+  id                     String         @id @default(cuid())
+  category               LessonCategory
+  cefrLevel              CefrLevel
+  theme                  String
+  title                  String
+  comprehensionQuestions Json
+  speakingTask           Json
+  writingTask            Json
+  createdAt              DateTime       @default(now())
+
+  dialogueLines    Dialogue[]
+  vocabulary       Vocabulary[]
+  expressions      Expression[]
+  grammarPoints    Grammar[]
+  newsLesson       NewsLesson?
+  learningHistory  LearningHistory[]
+  speakingFeedback SpeakingFeedback[]
+  writingFeedback  WritingFeedback[]
+}
+
+model Dialogue {
+  id       String @id @default(cuid())
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  order    Int
+  speaker  String
+  lineEn   String
+  lineJa   String
+
+  @@index([lessonId])
+}
+
+// lessonId is nullable so a user can register their own word directly
+// (createdByUserId set, lessonId null) instead of only via a generated
+// lesson's vocabulary list.
+model Vocabulary {
+  id              String      @id @default(cuid())
+  lessonId        String?
+  lesson          Lesson?     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  word            String
+  partOfSpeech    String
+  meaningJa       String
+  exampleSentence String
+  cefrLevel       CefrLevel
+  createdByUserId String?
+  createdBy       User?       @relation("VocabularyCreatedBy", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  createdAt       DateTime    @default(now())
+
+  favoritedBy FavoriteVocabulary[]
+
+  @@index([lessonId])
+  @@index([createdByUserId])
+}
+
+model Expression {
+  id              String      @id @default(cuid())
+  lessonId        String?
+  lesson          Lesson?     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  phrase          String
+  meaningJa       String
+  exampleSentence String
+  createdByUserId String?
+  createdBy       User?       @relation("ExpressionCreatedBy", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  createdAt       DateTime    @default(now())
+
+  favoritedBy FavoriteExpression[]
+
+  @@index([lessonId])
+  @@index([createdByUserId])
+}
+
+model Grammar {
+  id                String   @id @default(cuid())
+  lessonId          String?
+  lesson            Lesson?  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  name              String
+  explanationJa     String
+  pattern           String
+  exampleSentences  Json
+  createdByUserId   String?
+  createdBy         User?    @relation("GrammarCreatedBy", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+
+  favoritedBy FavoriteGrammar[]
+
+  @@index([lessonId])
+  @@index([createdByUserId])
+}
+
+// News Discussion lessons extend a base Lesson with the article-adaptation
+// output from Stage A/B of the news pipeline (docs/ai-prompt-design.md §2).
+model NewsLesson {
+  id                 String   @id @default(cuid())
+  lessonId           String   @unique
+  lesson             Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  sourceTitle        String
+  sourceUrl          String
+  adaptedPassageEn   String
+  adaptedPassageJa   String
+  keywords           Json
+  discussionPrompts  Json
+  summaryTask        Json
+}
+
+// One row per completed lesson per user; aggregates the weak-point tags
+// extracted from that lesson's feedback, consumed by the next lesson's
+// generation prompt (focusGrammar / focusVocab).
+model LearningHistory {
+  id                 String    @id @default(cuid())
+  userId             String
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId           String
+  lesson             Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt        DateTime  @default(now())
+  weakGrammarTags    Json
+  weakVocabTags      Json
+  cefrEstimateAtTime CefrLevel
+
+  @@index([userId])
+  @@index([lessonId])
+}
+
+// Raw AI correction output for a user's spoken response to a lesson's
+// speaking_task (schema: docs/ai-prompt-design.md §3).
+model SpeakingFeedback {
+  id                          String   @id @default(cuid())
+  userId                      String
+  user                        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId                    String
+  lesson                      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userTranscript              String
+  strengths                   Json
+  grammarCorrections          Json
+  naturalExpressionSuggestions Json
+  vocabularyUpgrades          Json
+  fluencyFeedbackJa           String
+  logicalCoherenceFeedbackJa  String
+  cefrEstimate                CefrLevel
+  nextFocusPointJa            String
+  createdAt                   DateTime @default(now())
+
+  @@index([userId])
+  @@index([lessonId])
+}
+
+// Raw AI correction output for a user's written response to a lesson's
+// writing_task (schema: docs/ai-prompt-design.md §4).
+model WritingFeedback {
+  id                          String   @id @default(cuid())
+  userId                      String
+  user                        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId                    String
+  lesson                      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userText                    String
+  strengths                   Json
+  grammarCorrections          Json
+  naturalExpressionSuggestions Json
+  vocabularyUpgrades          Json
+  structureFeedbackJa         String
+  logicalCoherenceFeedbackJa  String
+  cefrEstimate                CefrLevel
+  nextFocusPointJa            String
+  createdAt                   DateTime @default(now())
+
+  @@index([userId])
+  @@index([lessonId])
+}
+
+// Spaced-repetition queue for weak grammar/vocab tags surfaced by feedback.
+// Tags are free-text labels (not FKs to Grammar/Vocabulary rows), matching
+// the string[] weak-point profile used in the AI prompts.
+model ReviewSchedule {
+  id             String         @id @default(cuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType       ReviewItemType
+  itemLabel      String
+  intervalStage  Int            @default(0)
+  dueAt          DateTime
+  lastReviewedAt DateTime?
+  createdAt      DateTime       @default(now())
+
+  @@index([userId, dueAt])
+}
+
+model FavoriteVocabulary {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabularyId String
+  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([userId, vocabularyId])
+}
+
+model FavoriteGrammar {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grammarId String
+  grammar   Grammar  @relation(fields: [grammarId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, grammarId])
+}
+
+model FavoriteExpression {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expressionId String
+  expression   Expression @relation(fields: [expressionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([userId, expressionId])
+}

@@ -1,0 +1,236 @@
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2rem 1.5rem;
+}
+
+.blobPink,
+.blobMint,
+.blobYellow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  z-index: 0;
+  animation: float 9s ease-in-out infinite;
+}
+
+.blobPink {
+  width: 22rem;
+  height: 22rem;
+  background: var(--primary);
+  top: -4rem;
+  left: -4rem;
+}
+
+.blobMint {
+  width: 18rem;
+  height: 18rem;
+  background: var(--secondary);
+  bottom: -3rem;
+  right: -2rem;
+  animation-delay: 2s;
+}
+
+.blobYellow {
+  width: 14rem;
+  height: 14rem;
+  background: var(--accent);
+  top: 40%;
+  right: 15%;
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-24px) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blobPink,
+  .blobMint,
+  .blobYellow {
+    animation: none;
+  }
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 40rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.kicker {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: var(--radius-pill);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.heroTitle {
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.ctaButton {
+  display: inline-block;
+  padding: 0.9rem 2.2rem;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  color: white;
+  font-weight: 800;
+  font-size: 1.05rem;
+  box-shadow: var(--shadow-pop);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ctaButton:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 14px 28px -8px rgba(255, 92, 138, 0.45);
+}
+
+/* ---------- Feature sections ---------- */
+
+.featureSection {
+  padding: 4rem 1.5rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.featureRow,
+.featureRowReverse {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.featureRowReverse {
+  flex-direction: row-reverse;
+}
+
+.featureBadge {
+  flex-shrink: 0;
+  width: 9rem;
+  height: 9rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.featureEmoji {
+  font-size: 3.5rem;
+}
+
+.featureText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.featureKicker {
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.featureTitle {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.featureBody {
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 640px) {
+  .featureRow,
+  .featureRowReverse {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+}
+
+/* ---------- Coach section ---------- */
+
+.coachSection {
+  padding: 3rem 1.5rem 5rem;
+  max-width: 48rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.coachCard {
+  padding: 3rem 2.5rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, var(--primary-soft), var(--purple-soft));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: center;
+  align-items: center;
+}
+
+.coachKicker {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: var(--radius-pill);
+  background: var(--card-bg);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-strong);
+}
+
+/* ---------- Final CTA ---------- */
+
+.finalCta {
+  padding: 4rem 1.5rem 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.finalCtaTitle {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+}

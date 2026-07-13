@@ -1,0 +1,15 @@
+.favoriteStar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #d4a017;
+  vertical-align: middle;
+  padding: 0;
+  line-height: 1;
+}
+
+.favoriteStar:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
