@@ -5,8 +5,16 @@
   font-size: 1.1rem;
   color: #d4a017;
   vertical-align: middle;
-  padding: 0;
   line-height: 1;
+  /* Padding pushes the tappable area to ~44px (the standard minimum
+     touch-target size) without inflating the visible star glyph, and the
+     negative margin cancels the extra padding out of the surrounding
+     layout so text alignment doesn't shift. */
+  padding: 0.6rem;
+  margin: -0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .favoriteStar:disabled {

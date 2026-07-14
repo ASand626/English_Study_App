@@ -7,6 +7,17 @@
   gap: 1.5rem;
 }
 
+@media (max-width: 400px) {
+  .main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .grid {
+    gap: 0.25rem;
+  }
+}
+
 .main h1 {
   font-size: 1.6rem;
 }

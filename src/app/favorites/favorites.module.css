@@ -7,6 +7,13 @@
   gap: 1.75rem;
 }
 
+@media (max-width: 400px) {
+  .main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 .main h1 {
   font-size: 1.6rem;
 }
@@ -91,7 +98,9 @@
   font-weight: 700;
   font-size: 0.85rem;
   cursor: pointer;
-  padding: 0;
+  /* Same touch-target padding trick as .favoriteStar. */
+  padding: 0.6rem;
+  margin: -0.6rem;
 }
 
 .deleteButton:disabled {

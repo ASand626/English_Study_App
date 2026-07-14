@@ -7,10 +7,22 @@
   gap: 2.25rem;
 }
 
+@media (max-width: 400px) {
+  .main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .generateForm {
+    padding: 1.1rem;
+  }
+}
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
@@ -21,18 +33,26 @@
 .header p {
   color: var(--muted);
   margin-top: 0.25rem;
+  overflow-wrap: anywhere;
 }
 
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
   font-size: 0.9rem;
   font-weight: 700;
 }
 
 .headerActions a {
   color: var(--primary-strong);
+}
+
+@media (max-width: 420px) {
+  .header {
+    flex-direction: column;
+  }
 }
 
 .signOutButton {

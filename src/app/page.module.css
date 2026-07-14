@@ -8,6 +8,10 @@
 .hero {
   position: relative;
   min-height: 92vh;
+  /* dvh accounts for the mobile browser chrome (address bar) showing or
+     hiding, so the hero doesn't jump/resize as the user scrolls — vh alone
+     is measured against the largest possible viewport and leaves a gap. */
+  min-height: 92dvh;
   display: flex;
   align-items: center;
   justify-content: center;

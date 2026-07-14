@@ -107,6 +107,18 @@ input,
 select,
 textarea {
   font-family: inherit;
+  /* Below 16px, iOS Safari auto-zooms the whole page on focus — this
+     keeps every field at exactly the zoom threshold regardless of any
+     smaller font-size inherited from a wrapping label. */
+  font-size: 16px;
+}
+
+a,
+button {
+  /* Removes the gray flash-on-tap highlight (looks distinctly
+     non-native/web-app-y on Android) and the legacy 300ms tap delay. */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 @media (prefers-color-scheme: dark) {

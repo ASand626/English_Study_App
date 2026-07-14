@@ -7,6 +7,17 @@
   gap: 2.5rem;
 }
 
+@media (max-width: 400px) {
+  .main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .section {
+    padding: 1.1rem;
+  }
+}
+
 .backLink {
   font-size: 0.9rem;
   font-weight: 700;
@@ -137,7 +148,20 @@
 .quizChoices {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.15rem;
+}
+
+.quizChoices label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.quizChoices input {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
 }
 
 .quizQuestion button {
